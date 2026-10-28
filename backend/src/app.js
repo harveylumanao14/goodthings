@@ -1,21 +1,25 @@
 import cors from "cors";
 import express from "express";
-import { pool } from "./db.js";
-import todosRouter from "./routes/todos.js";
+import { pool } from "./config/db.js";
+import authRoutes from "../src/routes/authRoutes.js";
+import userRoutes from "../src/routes/userRoutes.js";
+import errorHandling from "./middlewares/errorHandler.js";
+import createUserTable from "./migrations/createUserTable.js";
 
 const app = express();
 
+// Middlewares
+app.use(express.json());
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
   }),
 );
-app.use(express.json());
 
+// Testing DB Connections
 app.get("/api/health", (_request, response) => {
   response.json({ status: "ok" });
 });
-
 app.get("/api/health/db", async (_request, response, next) => {
   try {
     await pool.query("SELECT 1");
@@ -25,11 +29,14 @@ app.get("/api/health/db", async (_request, response, next) => {
   }
 });
 
-app.use("/api/todos", todosRouter);
+// Table migrations
+createUserTable();
 
-app.use((error, _request, response, _next) => {
-  console.error(error);
-  response.status(500).json({ error: "Internal server error." });
-});
+// Error Handling Middlewares
+app.use(errorHandling);
+
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
 
 export default app;
