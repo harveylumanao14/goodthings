@@ -116,10 +116,6 @@ export default function Order({ cartItems = [], onPlaceOrder }) {
                     />
                 </div>
 
-
-
-
-
                 <button
                     type="submit"
                     className="w-full rounded-xl bg-emerald-800 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
